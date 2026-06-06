@@ -6,17 +6,27 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
 # Load saved model
-model = joblib.load(
-    "spam_model.pkl"
-)
+model = joblib.load("models/spam_model.pkl")
 
-vectorizer = joblib.load(
-    "vectorizer.pkl"
-)
+vectorizer = joblib.load("models/vectorizer.pkl")
 
 stemmer = PorterStemmer()
 
 nltk.download("stopwords")
+danger_words = [
+    "free",
+    "winner",
+    "offer",
+    "click",
+    "claim",
+    "urgent",
+    "verify",
+    "reward",
+    "bank",
+    "password",
+    "otp",
+    "prize"
+]
 
 def preprocess(text):
 
@@ -51,6 +61,15 @@ if st.button("Analyze Email"):
     processed = preprocess(
         email
     )
+    found_words = []
+
+email_lower = email.lower()
+
+for word in danger_words:
+
+    if word in email_lower:
+
+        found_words.append(word)
 
     vector = vectorizer.transform(
         [processed]
@@ -61,10 +80,15 @@ if st.button("Analyze Email"):
     )
 
     if prediction[0] == 1:
+        st.error("❌ Spam Email")
 
-        st.error(
-            "❌ Spam Email"
-        )
+    if found_words:
+
+        st.subheader("⚠ Suspicious Words Found")
+
+        for word in found_words:
+
+            st.write("•", word)
 
     else:
 

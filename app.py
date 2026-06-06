@@ -78,9 +78,35 @@ for word in danger_words:
     prediction = model.predict(
         vector
     )
+    probability = model.predict_proba(vector)
+
+    spam_score = round(
+    probability[0][1] * 100,
+    2
+    )
+    if spam_score >= 80:
+
+        risk = "HIGH"
+
+    elif spam_score >= 50:
+
+        risk = "MEDIUM"
+
+    else:
+
+        risk = "LOW"
 
     if prediction[0] == 1:
-        st.error("❌ Spam Email")
+       st.error("❌ Spam Email")
+    st.metric(
+    "Spam Probability",
+    f"{spam_score}%"
+    )
+
+    st.metric(
+    "Risk Level",
+    risk
+    )
 
     if found_words:
 
